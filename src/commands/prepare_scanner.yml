@@ -38,4 +38,5 @@ steps:
             -Dsonar.branch.name=$CIRCLE_BRANCH"
         fi
         mkdir .scannerwork
+        echo "$sonarParams"
         echo "$sonarParams" > .scannerwork/scanner_params.txt
