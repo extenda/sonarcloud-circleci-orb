@@ -19,7 +19,7 @@ steps:
           git rev-parse origin/<< parameters.main_branch >>
         fi
 
-        sonarParams="-Dsonar.host.url=https://sonarcloud.io \
+        sonarParams="-Dsonar.verbose=true -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=$SONAR_AUTH_TOKEN \
           -Dsonar.organization=$SONAR_ORGANIZATION \
           -Dsonar.projectKey=${SONAR_ORGANIZATION}_${CIRCLE_PROJECT_REPONAME} \
