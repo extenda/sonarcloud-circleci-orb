@@ -7,30 +7,33 @@ jobs:
   test_npm:
     docker:
       - image: circleci/node:10
-    working_directory: ~/workspace/test/npm
     steps:
-      - checkout:
-          path: ~/workspace
+      - checkout
+      - run:
+          name: Prepare test
+          command: mv -f test/npm/* .
       - sonarcloud/scan_with_npm
       - sonarcloud/check_quality_gate
 
   test_maven:
     docker:
       - image: circleci/openjdk:11
-    working_directory: ~/workspace/test/java
     steps:
-      - checkout:
-          path: ~/workspace
+      - checkout
+      - run:
+          name: Prepare test
+          command: mv -f test/java/* .
       - sonarcloud/scan_with_maven
       - sonarcloud/check_quality_gate
 
   test_gradle:
     docker:
       - image: circleci/openjdk:11
-    working_directory: ~/workspace/test/java
     steps:
-      - checkout:
-          path: ~/workspace
+      - checkout
+      - run:
+          name: Prepare test
+          command: mv -f test/java/* .
       - sonarcloud/scan_with_gradle
       - sonarcloud/check_quality_gate
 
