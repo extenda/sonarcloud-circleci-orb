@@ -1,4 +1,4 @@
-test/java/target
-test/java/build
+target/
+build/
 node_modules/
-test/java/.gradle
+.gradle/

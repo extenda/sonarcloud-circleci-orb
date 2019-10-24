@@ -11,10 +11,11 @@ jobs:
       - checkout
       - run:
           name: Prepare test
-          command: mv -f test/npm/* .
+          command: |
+            rm -rf src
+            mv -f test/npm/* .
       - sonarcloud/scan_with_npm
       - sonarcloud/check_quality_gate
-
   test_maven:
     docker:
       - image: circleci/openjdk:11
@@ -22,10 +23,12 @@ jobs:
       - checkout
       - run:
           name: Prepare test
-          command: mv -f test/java/* .
+          command: |
+            rm -rf src
+            mv -f test/java/* .
+            mvn package
       - sonarcloud/scan_with_maven
       - sonarcloud/check_quality_gate
-
   test_gradle:
     docker:
       - image: circleci/openjdk:11
@@ -33,12 +36,33 @@ jobs:
       - checkout
       - run:
           name: Prepare test
-          command: mv -f test/java/* .
+          command: |
+            rm -rf src
+            mv -f test/java/* .
+            ./gradlew build
       - sonarcloud/scan_with_gradle
       - sonarcloud/check_quality_gate
 
+# yaml anchor filters
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
+prod-deploy_requires: &prod-deploy_requires
+  [
+    test_maven-master
+  ]
+
 workflows:
-  sonarcloud-orb:
+  lint_pack-validate_publish-dev:
     jobs:
       - orb-tools/lint
       - orb-tools/pack:
@@ -49,15 +73,74 @@ workflows:
           context: orb-publishing
           requires:
             - orb-tools/pack
-      - test_npm:
-          context: sonarcloud
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-dev
+          ssh-fingerprints: 05:12:ce:ef:cc:dd:56:5b:f2:35:e5:0b:5c:00:7d:62
+          context: orb-publishing
           requires:
             - orb-tools/publish-dev
+          filters:
+            branches:
+              ignore: master
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-master
+          ssh-fingerprints: 05:12:ce:ef:cc:dd:56:5b:f2:35:e5:0b:5c:00:7d:62
+          context: orb-publishing
+          tag: master
+          requires:
+            - orb-tools/publish-dev
+          filters:
+            branches:
+              only: master
+
+  integration-tests_prod-release:
+    jobs:
+      # triggered by non-master branch commits
       - test_maven:
+          name: test_maven-dev
           context: sonarcloud
-          requires:
-            - orb-tools/publish-dev
-      - test_gradle:
+          filters: *integration-dev_filters
+
+      # triggered by master branch commits
+      - test_maven:
+          name: test_maven-master
           context: sonarcloud
-          requires:
-            - orb-tools/publish-dev
+          filters: *integration-master_filters
+
+      # patch, minor, or major publishing, depending on which orb source
+      # files have been modified (that logic lives in the
+      # trigger-integration-workflow job's source)
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
+          orb-name: extendaretail/sonarcloud
+          context: orb-publishing
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          release: minor
+          orb-name: extendaretail/sonarcloud
+          context: orb-publishing
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          release: major
+          orb-name: extendaretail/sonarcloud
+          context: orb-publishing
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/
