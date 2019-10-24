@@ -1,0 +1,4 @@
+version: 2.1
+
+description: |
+  Collection of commands to perform a SonarCloud analysis on a project.

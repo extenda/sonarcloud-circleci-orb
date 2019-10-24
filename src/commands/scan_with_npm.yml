@@ -1,0 +1,16 @@
+description: Run the Sonar scanner on an NPM project.
+parameters:
+  main_branch:
+    description: The name of the Sonar main branch.
+    type: string
+    default: master
+steps:
+  - prepare_scanner:
+      main_branch: << parameters.main_branch >>
+  - run:
+      name: Sonar analysis
+      command: |
+        sudo npm install -g sonarqube-scanner
+
+        # shellcheck disable=SC2046
+        sonar-scanner "-Dsonar.projectVersion=$(node -p "require('./package.json').version")" $(cat .scannerwork/scanner_params.txt)

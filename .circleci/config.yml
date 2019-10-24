@@ -1,0 +1,30 @@
+version: 2.1
+orbs:
+  orb-tools: circleci/orb-tools@8.27.4
+  sonarcloud: extendaretail/sonarcloud@dev:alpha
+
+jobs:
+  test_npm:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - sonarcloud/scan_with_npm
+      - sonarcloud/check_quality_gate
+
+workflows:
+  sonarcloud-orb:
+    jobs:
+      - orb-tools/lint
+      - orb-tools/pack:
+          requires:
+            - orb-tools/lint
+      - orb-tools/publish-dev:
+          orb-name: extendaretail/sonarcloud
+          context: orb-publishing
+          requires:
+            - orb-tools/pack
+      - test_npm:
+          context: sonarcloud
+          requires:
+            - orb-tools/publish-dev

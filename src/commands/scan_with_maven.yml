@@ -1,0 +1,22 @@
+description: Run the Sonar Maven scanner.
+parameters:
+  maven_executable:
+    description: Path to the maven executable.
+    type: string
+    default: mvn
+  scanner_version:
+    description: The Maven scanner version
+    type: string
+    default: 3.6.0.1398
+  main_branch:
+    description: The name of the Sonar main branch.
+    type: string
+    default: master
+steps:
+  - prepare_scanner:
+      main_branch: << parameters.main_branch >>
+  - run:
+      name: Sonar analysis
+      command: |
+        # shellcheck disable=SC2046
+        << parameters.maven_executable >> org.sonarsource.scanner.maven:sonar-maven-plugin:<< parameters.scanner_version >> $(cat .scannerwork/scanner_params.txt)

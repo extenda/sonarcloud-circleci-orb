@@ -1,0 +1,38 @@
+description: | 
+  Internal command to prepare the Sonar scanner parameters. Users of
+  the Orb don't need to call this step explicitly.
+parameters:
+  main_branch:
+    description: The name of the Sonar main branch.
+    type: string
+    default: master
+steps:
+  - run:
+      name: Prepare Sonar scanner parameters
+      command: |
+        if [ "$CIRCLE_BRANCH" != "<< parameters.main_branch >>" ]; then
+          # We need to fix the reference to parent, due to how CircleCI checkout code:
+          # https://discuss.circleci.com/t/git-checkout-of-a-branch-destroys-local-reference-to-master/23781
+          # https://community.sonarsource.com/t/code-is-empty-on-pull-request-reviews/822/11?u=sasjo
+          git fetch --no-tags origin << parameters.main_branch >>
+          git branch -D << parameters.main_branch >>
+          git rev-parse origin/<< parameters.main_branch >>
+        fi
+
+        sonarParams="-Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=$SONAR_AUTH_TOKEN"
+
+        if [ -n "$CIRCLE_PULL_REQUEST" ]; then
+          pullRequestId=$(echo "$CIRCLE_PULL_REQUEST" | sed s/\\//\\n/g | tail -n 1)
+          sonarParams="$sonarParams \
+            -Dsonar.pullrequest.base=<< parameters.main_branch >> \
+            -Dsonar.pullrequest.branch=$CIRCLE_BRANCH \
+            -Dsonar.pullrequest.key=$pullRequestId \
+            -Dsonar.pullrequest.provider=github \
+            -Dsonar.pullrequest.github.repository=$SONAR_ORGANIZATION/$CIRCLE_PROJECT_REPONAME"
+        elif [ "$CIRCLE_BRANCH" != "<< parameters.main_branch >>" ]; then
+          sonarParams="$sonarParams \
+            -Dsonar.branch.name=$CIRCLE_BRANCH"
+        fi
+        mkdir .scannerwork
+        echo "$sonarParams" > .scannerwork/scanner_params.txt

@@ -1,0 +1,22 @@
+description: Run the Sonar Gradle scanner.
+parameters:
+  gradle_executable:
+    description: Path to the gradle executable.
+    type: string
+    default: ./gradlew
+  gradle_task:
+    description: The name of the Gradle task to run.
+    type: string
+    default: sonarqube
+  main_branch:
+    description: The name of the Sonar main branch.
+    type: string
+    default: master
+steps:
+  - prepare_scanner:
+      main_branch: << parameters.main_branch >>
+  - run:
+      name: Sonar analysis
+      command: |
+        # shellcheck disable=SC2046
+        << parameters.gradle_executable >> << parameters.gradle_task >> $(cat .scannerwork/scanner_params.txt)
