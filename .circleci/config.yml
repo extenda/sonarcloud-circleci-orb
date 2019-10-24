@@ -7,9 +7,31 @@ jobs:
   test_npm:
     docker:
       - image: circleci/node:10
+    working_directory: ~/workspace/test/npm
     steps:
-      - checkout
+      - checkout:
+          path: ~/workspace
       - sonarcloud/scan_with_npm
+      - sonarcloud/check_quality_gate
+
+  test_maven:
+    docker:
+      - image: circleci/openjdk:11
+    working_directory: ~/workspace/test/java
+    steps:
+      - checkout:
+          path: ~/workspace
+      - sonarcloud/scan_with_maven
+      - sonarcloud/check_quality_gate
+
+  test_gradle:
+    docker:
+      - image: circleci/openjdk:11
+    working_directory: ~/workspace/test/java
+    steps:
+      - checkout:
+          path: ~/workspace
+      - sonarcloud/scan_with_gradle
       - sonarcloud/check_quality_gate
 
 workflows:
@@ -25,6 +47,14 @@ workflows:
           requires:
             - orb-tools/pack
       - test_npm:
+          context: sonarcloud
+          requires:
+            - orb-tools/publish-dev
+      - test_maven:
+          context: sonarcloud
+          requires:
+            - orb-tools/publish-dev
+      - test_gradle:
           context: sonarcloud
           requires:
             - orb-tools/publish-dev

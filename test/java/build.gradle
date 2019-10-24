@@ -1,0 +1,11 @@
+plugins {
+  id 'java'
+  id 'org.sonarqube' version '2.7'
+}
+
+group = 'com.extendaretail.orbs'
+version = '0.0.1-test'
+
+repositories {
+  mavenCentral()
+}
