@@ -19,4 +19,4 @@ steps:
       name: Sonar analysis
       command: |
         # shellcheck disable=SC2046
-        << parameters.maven_executable >> org.sonarsource.scanner.maven:sonar-maven-plugin:<< parameters.scanner_version >> $(cat .scannerwork/scanner_params.txt)
+        << parameters.maven_executable >> org.sonarsource.scanner.maven:sonar-maven-plugin:<< parameters.scanner_version >>:sonar $(cat .scannerwork/scanner_params.txt)
