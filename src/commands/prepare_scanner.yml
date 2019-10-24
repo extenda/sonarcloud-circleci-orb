@@ -21,7 +21,7 @@ steps:
 
         sonarParams="-Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=$SONAR_AUTH_TOKEN \
-          -Dsonar.organization=$SONAR_ORGANIZATION
+          -Dsonar.organization=$SONAR_ORGANIZATION \
           -Dsonar.projectKey=${SONAR_ORGANIZATION}_${CIRCLE_PROJECT_REPONAME} \
           -Dsonar.projectName=$CIRCLE_PROJECT_REPONAME"
 
