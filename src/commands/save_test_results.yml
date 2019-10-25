@@ -5,12 +5,13 @@ description: |
   If your project is compiled (java), the recommendation is to analyse in the
   same job that performed the build and ran the tests since the scanner will
   need the binaries.
+
 steps:
   - persist_to_workspace:
       root: .
       paths:
-        - **/TEST-*.xml
-        - **/coverage/**
-        - **/test-result/**
-        - **/jacoco.xml
-        - **/*.exec
+        - "**/TEST-*.xml"
+        - "**/coverage/**"
+        - "**/test-result/**"
+        - "**/jacoco.xml"
+        - "**/*.exec"
