@@ -4,7 +4,7 @@ orbs:
   sonarcloud: extendaretail/sonarcloud@dev:alpha
 
 jobs:
-  test_npm:
+  test_scan_npm:
     docker:
       - image: circleci/openjdk:11-node
     steps:
@@ -17,7 +17,7 @@ jobs:
             mv -f test/npm/* .
             mvn package
       - sonarcloud/scan_with_npm
-      - sonarcloud/save_test_results
+    #  - sonarcloud/save_test_results
 
   test_maven:
     docker:
@@ -123,7 +123,7 @@ workflows:
           name: test_check_npm-dev
           context: sonarcloud
           requires:
-            - test_npm-dev
+            - test_scan_npm-dev
           filters: *integration-dev_filters
 
       - test_gradle:
