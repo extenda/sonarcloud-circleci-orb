@@ -7,6 +7,6 @@ public class DummyTest {
 
   @org.junit.Test
   public void newInstance() {
-    org.junit.Assertions.assertNotNull(new Test());
+    org.junit.Assert.assertNotNull(new Test());
   }
 }
