@@ -59,7 +59,8 @@ integration-master_filters: &integration-master_filters
 prod-deploy_requires: &prod-deploy_requires
   [
     test_maven-master,
-    test_npm-master
+    test_npm-master,
+    test_gradle-master
   ]
 
 workflows:
@@ -110,7 +111,12 @@ workflows:
       - test_npm:
           name: test_npm-dev
           context: sonarcloud
-          filters: *integration-master_filters
+          filters: *integration-dev_filters
+
+      - test_gradle:
+          name: test_gradle-dev
+          context: sonarcloud
+          filters: *integration-dev_filters
 
       # triggered by master branch commits
       - test_maven:
@@ -120,6 +126,11 @@ workflows:
 
       - test_npm:
           name: test_npm-master
+          context: sonarcloud
+          filters: *integration-master_filters
+
+      - test_gradle:
+          name: test_gradle-master
           context: sonarcloud
           filters: *integration-master_filters
 
