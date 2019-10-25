@@ -1,5 +1,5 @@
 description: |
-  Save test and coverage reports for use in a Sonar analysis.
+  Store test and coverage reports for use in a Sonar analysis.
   Use this command when you intend to run the analysis in a separate job.
 
   If your project is compiled (java), the recommendation is to analyse in the
