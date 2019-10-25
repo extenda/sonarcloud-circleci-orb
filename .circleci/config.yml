@@ -81,7 +81,6 @@ workflows:
           name: trigger-integration-dev
           ssh-fingerprints: 05:12:ce:ef:cc:dd:56:5b:f2:35:e5:0b:5c:00:7d:62
           context: orb-publishing
-          cleanup-tags: true
           requires:
             - orb-tools/publish-dev
           filters:
