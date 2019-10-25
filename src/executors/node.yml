@@ -1,0 +1,4 @@
+description: |
+  Docker executor with Node.
+docker:
+  - image: circleci/node:10

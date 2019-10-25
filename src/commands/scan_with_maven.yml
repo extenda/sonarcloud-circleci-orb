@@ -21,3 +21,7 @@ steps:
         # shellcheck disable=SC2046
         << parameters.maven_executable >> org.sonarsource.scanner.maven:sonar-maven-plugin:<< parameters.scanner_version >>:sonar $(cat .scannerwork/scanner_params.txt)
         mv target/sonar/report-task.txt .scannerwork
+  - persist_to_workspace:
+      root: .
+      paths:
+        - .scannerwork/report-task.txt

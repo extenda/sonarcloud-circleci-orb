@@ -21,3 +21,7 @@ steps:
         # shellcheck disable=SC2046
         << parameters.gradle_executable >> << parameters.gradle_task >> $(cat .scannerwork/scanner_params.txt)
         mv build/sonar/report-task.txt .scannerwork
+  - persist_to_workspace:
+      root: .
+      paths:
+        - .scannerwork/report-task.txt

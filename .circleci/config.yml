@@ -17,7 +17,8 @@ jobs:
             mv -f test/npm/* .
             mvn package
       - sonarcloud/scan_with_npm
-      - sonarcloud/check_quality_gate
+      - sonarcloud/save_test_results
+
   test_maven:
     docker:
       - image: circleci/openjdk:11
@@ -31,6 +32,7 @@ jobs:
             mvn package
       - sonarcloud/scan_with_maven
       - sonarcloud/check_quality_gate
+
   test_gradle:
     docker:
       - image: circleci/openjdk:11
@@ -44,6 +46,7 @@ jobs:
             ./gradlew build
       - sonarcloud/scan_with_gradle
       - sonarcloud/check_quality_gate
+
 
 # yaml anchor filters
 integration-dev_filters: &integration-dev_filters
@@ -61,8 +64,9 @@ integration-master_filters: &integration-master_filters
 prod-deploy_requires: &prod-deploy_requires
   [
     test_maven-master,
-    test_npm-master,
-    test_gradle-master
+    test_gradle-master,
+    test_scan_npm-master,
+    test_check_npm-master
   ]
 
 workflows:
@@ -110,9 +114,16 @@ workflows:
           context: sonarcloud
           filters: *integration-dev_filters
 
-      - test_npm:
-          name: test_npm-dev
+      - test_scan_npm:
+          name: test_scan_npm-dev
           context: sonarcloud
+          filters: *integration-dev_filters
+
+      - sonarcloud/check_quality_gate:
+          name: test_check_npm-dev
+          context: sonarcloud
+          requires:
+            - test_npm-dev
           filters: *integration-dev_filters
 
       - test_gradle:
@@ -126,9 +137,16 @@ workflows:
           context: sonarcloud
           filters: *integration-master_filters
 
-      - test_npm:
-          name: test_npm-master
+      - test_scan_npm:
+          name: test_scan_npm-master
           context: sonarcloud
+          filters: *integration-master_filters
+
+      - sonarcloud/check_quality_gate:
+          name: test_check_npm-master
+          context: sonarcloud
+          requires:
+            - test_scan_npm-master
           filters: *integration-master_filters
 
       - test_gradle:
