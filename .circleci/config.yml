@@ -6,7 +6,7 @@ orbs:
 jobs:
   test_npm:
     docker:
-      - image: circleci/openjdk-11-node
+      - image: circleci/openjdk:11-node
     steps:
       - checkout
       - run:
