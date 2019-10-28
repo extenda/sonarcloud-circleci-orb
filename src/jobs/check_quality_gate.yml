@@ -1,0 +1,12 @@
+description: |
+  Wait for the scanner results. This command assumes an analysis has been
+  run and will wait for SonarCloud to update the quality gate for the
+  analysis.
+
+executor: node
+
+steps:
+  - checkout
+  - attach_workspace:
+      at: .
+  - check_quality_gate

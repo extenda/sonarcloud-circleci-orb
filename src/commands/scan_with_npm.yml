@@ -14,3 +14,7 @@ steps:
 
         # shellcheck disable=SC2046
         sonar-scanner "-Dsonar.projectVersion=$(node -p "require('./package.json').version")" $(cat .scannerwork/scanner_params.txt)
+  - persist_to_workspace:
+      root: .
+      paths:
+        - .scannerwork/report-task.txt
