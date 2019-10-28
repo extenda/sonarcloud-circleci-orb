@@ -1,0 +1,24 @@
+description: |
+  Perform a SonarCloud analysis on a Maven project.
+
+usage:
+  version: 2.1
+  orbs:
+    sonarcloud: extendaretail/sonarcloud@1.0.0
+  job:
+    commit:
+      docker:
+        - image: openjdk:11
+      steps:
+        - checkout
+        - run: mvn package
+        - sonarcloud/scan_with_maven
+  workflows:
+    main:
+      jobs:
+        - commit:
+            context: sonarcloud
+        - sonarcloud/check_quality_gate:
+            context: sonarcloud
+            requires:
+              - commit
